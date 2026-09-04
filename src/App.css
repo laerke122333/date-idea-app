@@ -3599,3 +3599,434 @@ p {
   opacity: 0.55;
   cursor: default;
 }
+
+/* =========================================================
+   FÆLLES SIDE - FORSLAG 2
+========================================================= */
+
+.shared-page-card-v2 {
+  margin-bottom: 22px;
+  padding: 24px;
+
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 30px;
+
+  background: rgba(255, 255, 255, 0.82);
+
+  box-shadow:
+    0 16px 40px
+    rgba(122, 62, 83, 0.09);
+}
+
+
+/* =========================================================
+   TOP
+========================================================= */
+
+.shared-page-top-v2 {
+  margin-bottom: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+.shared-page-top-v2 h2 {
+  margin: 0 0 4px;
+
+  font-family:
+    "Playfair Display",
+    serif;
+
+  font-size: 32px;
+  font-weight: 500;
+}
+
+.shared-page-top-v2 p {
+  margin: 0;
+
+  color: var(--grey);
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   AVATARS
+========================================================= */
+
+.shared-page-avatars-v2 {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.shared-avatar-v2 {
+  width: 47px;
+  height: 47px;
+
+  display: grid;
+  place-items: center;
+
+  border: 4px solid #f8c8d8;
+  border-radius: 50%;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ef5d8d,
+      #dc3e73
+    );
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shared-avatar-v2.partner {
+  color: #fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8d747d,
+      #665159
+    );
+}
+
+.shared-heart-v2 {
+  color: var(--pink);
+
+  font-size: 23px;
+}
+
+
+/* =========================================================
+   STORT MINDE
+========================================================= */
+
+.shared-featured-v2 {
+  overflow: hidden;
+
+  border: 1px solid #efd0db;
+  border-radius: 23px;
+
+  background: #fff;
+
+  box-shadow:
+    0 8px 22px
+    rgba(103, 54, 70, 0.06);
+}
+
+.shared-featured-image-v2 {
+  width: 100%;
+  height: 215px;
+
+  overflow: hidden;
+
+  background: #f8dce6;
+}
+
+.shared-featured-image-v2 img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.shared-image-placeholder-v2 {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  place-items: center;
+
+  color: var(--pink);
+
+  font-size: 55px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fde7ee,
+      #fff6f9
+    );
+}
+
+
+/* =========================================================
+   INFO UNDER STORT BILLEDE
+========================================================= */
+
+.shared-featured-info-v2 {
+  padding: 15px;
+
+  display: grid;
+  grid-template-columns:
+    38px 1fr 30px;
+
+  align-items: center;
+
+  gap: 11px;
+}
+
+.shared-calendar-v2 {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  color: var(--pink);
+
+  background: #fde7ef;
+
+  font-size: 20px;
+}
+
+.shared-featured-text-v2 h3 {
+  margin: 0 0 3px;
+
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.shared-featured-text-v2 p {
+  margin: 0;
+
+  color: var(--grey);
+
+  font-size: 10px;
+}
+
+.shared-arrow-v2 {
+  color: var(--pink);
+
+  text-align: center;
+
+  font-size: 27px;
+  font-weight: 300;
+}
+
+
+/* =========================================================
+   SMÅ DATES
+========================================================= */
+
+.shared-memory-list-v2 {
+  margin-top: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.shared-memory-row-v2 {
+  min-height: 88px;
+
+  padding: 9px;
+
+  display: grid;
+  grid-template-columns:
+    90px 1fr 30px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  border: 1px solid #efd0db;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.shared-memory-thumb-v2 {
+  width: 90px;
+  height: 68px;
+
+  overflow: hidden;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  color: var(--pink);
+
+  background: #f9e1ea;
+
+  font-size: 25px;
+}
+
+.shared-memory-thumb-v2 img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.shared-memory-text-v2 {
+  min-width: 0;
+}
+
+.shared-memory-text-v2 h3 {
+  margin: 0 0 4px;
+
+  overflow: hidden;
+
+  color: var(--text);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.shared-memory-text-v2 p {
+  margin: 0;
+
+  color: var(--grey);
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   PARTNERKODE
+========================================================= */
+
+.shared-code-v2 {
+  margin-top: 22px;
+  padding-top: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-top: 1px solid #efd0db;
+}
+
+.shared-code-v2 > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.shared-code-v2 span {
+  color: #a27b89;
+
+  font-size: 10px;
+}
+
+.shared-code-v2 strong {
+  color: var(--pink);
+
+  font-size: 20px;
+  letter-spacing: 4px;
+}
+
+.shared-code-v2 button {
+  padding: 11px 18px;
+
+  border: 0;
+  border-radius: 15px;
+
+  color: var(--pink);
+
+  background: #fde5ed;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   INGEN MINDER
+========================================================= */
+
+.shared-empty-v2 {
+  padding: 45px 20px;
+
+  border: 1px solid #efd0db;
+  border-radius: 22px;
+
+  text-align: center;
+
+  background: #fffafd;
+}
+
+.shared-empty-v2 > span {
+  color: var(--pink);
+
+  font-size: 45px;
+}
+
+.shared-empty-v2 h3 {
+  margin: 8px 0 5px;
+
+  font-family:
+    "Playfair Display",
+    serif;
+
+  font-size: 20px;
+}
+
+.shared-empty-v2 p {
+  max-width: 240px;
+
+  margin: auto;
+
+  color: var(--grey);
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   MOBIL
+========================================================= */
+
+@media (max-width: 380px) {
+  .shared-page-card-v2 {
+    padding: 18px;
+  }
+
+  .shared-page-top-v2 h2 {
+    font-size: 27px;
+  }
+
+  .shared-avatar-v2 {
+    width: 40px;
+    height: 40px;
+
+    border-width: 3px;
+  }
+
+  .shared-featured-image-v2 {
+    height: 185px;
+  }
+
+  .shared-memory-row-v2 {
+    grid-template-columns:
+      75px 1fr 25px;
+  }
+
+  .shared-memory-thumb-v2 {
+    width: 75px;
+    height: 62px;
+  }
+}

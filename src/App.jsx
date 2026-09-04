@@ -2323,11 +2323,16 @@ function SettingsPage({
     setMessage(result.message);
   }
 
-  const newestMemories = memories.slice(0, 3);
+  /* =======================================================
+   FÆLLES SIDE - MINDER
+======================================================= */
 
-  const memoryImages = memories
-    .filter((memory) => Boolean(memory.image_url))
-    .slice(0, 3);
+  const featuredMemory =
+    memories.find((memory) => memory.image_url) || memories[0] || null;
+
+  const otherMemories = featuredMemory
+    ? memories.filter((memory) => memory.id !== featuredMemory.id).slice(0, 2)
+    : [];
 
   return (
     <section className="screen page-with-nav">
@@ -2482,130 +2487,189 @@ function SettingsPage({
           )}
         </section>
       ) : (
-        /* =================================================
-           3. RIGTIG PARTNER FORBUNDET
-        ================================================= */
+        
 
-        <section className="couple-page-card">
-          <div className="couple-page-top">
-            <div>
-              <h2>Fælles side</h2>
+  /* =================================================
+     3. PARTNER FORBUNDET - FÆLLES SIDE
+  ================================================= */
 
-              <p>Se et preview af jeres fælles side</p>
-            </div>
+  <section className="shared-page-card-v2">
 
-            <div className="couple-avatars">
-              <div className="couple-avatar">{getInitial(session?.user)}</div>
+    {/* TOP */}
 
-              <span className="couple-heart">♥</span>
+    <div className="shared-page-top-v2">
+      <div>
+        <h2>Fælles side</h2>
 
-              <div className="couple-avatar partner"></div>
-            </div>
+        <p>
+          Jeres seneste dates samlet ét sted
+        </p>
+      </div>
+
+      <div className="shared-page-avatars-v2">
+        <div className="shared-avatar-v2">
+          {getInitial(session?.user)}
+        </div>
+
+        <span className="shared-heart-v2">
+          ♥
+        </span>
+
+        <div className="shared-avatar-v2 partner">
+          ♡
+        </div>
+      </div>
+    </div>
+
+    {/* =====================================
+        STORT FREMHÆVET MINDE
+    ===================================== */}
+
+    {featuredMemory ? (
+      <>
+        <article className="shared-featured-v2">
+
+          <div className="shared-featured-image-v2">
+            {featuredMemory.image_url ? (
+              <img
+                src={featuredMemory.image_url}
+                alt={featuredMemory.title}
+              />
+            ) : (
+              <div className="shared-image-placeholder-v2">
+                ♡
+              </div>
+            )}
           </div>
 
-          <div className="couple-page-content">
-            {/* VENSTRE */}
+          <div className="shared-featured-info-v2">
 
-            <div className="couple-preview-left">
-              <div className="couple-photo-grid">
-                {memoryImages.length > 0 ? (
-                  memoryImages.map((memory) => (
+            <div className="shared-calendar-v2">
+              ▣
+            </div>
+
+            <div className="shared-featured-text-v2">
+              <h3>
+                {featuredMemory.title}
+              </h3>
+
+              <p>
+                {featuredMemory.date
+                  ? formatDate(
+                      featuredMemory.date
+                    )
+                  : "Dato ikke angivet"}
+              </p>
+            </div>
+
+            <span className="shared-arrow-v2">
+              ›
+            </span>
+
+          </div>
+
+        </article>
+
+        {/* =====================================
+            DE NÆSTE DATES
+        ===================================== */}
+
+        <div className="shared-memory-list-v2">
+
+          {otherMemories.map(
+            (memory) => (
+              <article
+                className="shared-memory-row-v2"
+                key={memory.id}
+              >
+
+                <div className="shared-memory-thumb-v2">
+
+                  {memory.image_url ? (
                     <img
-                      key={memory.id}
                       src={memory.image_url}
                       alt={memory.title}
                     />
-                  ))
-                ) : (
-                  <>
-                    <div className="empty-preview-image">♡</div>
+                  ) : (
+                    <span>♡</span>
+                  )}
 
-                    <div className="empty-preview-image">♡</div>
-
-                    <div className="empty-preview-image">♡</div>
-                  </>
-                )}
-              </div>
-
-              <div className="couple-feature-list">
-                <div>
-                  <span>♡</span>
-
-                  <div>
-                    <strong>Delt</strong>
-
-                    <p>Alle dates samlet ét sted</p>
-                  </div>
                 </div>
 
-                <div>
-                  <span>▧</span>
+                <div className="shared-memory-text-v2">
+                  <h3>
+                    {memory.title}
+                  </h3>
 
-                  <div>
-                    <strong>Billeder</strong>
-
-                    <p>Del jeres bedste øjeblikke</p>
-                  </div>
+                  <p>
+                    {memory.date
+                      ? formatDate(
+                          memory.date
+                        )
+                      : "Dato ikke angivet"}
+                  </p>
                 </div>
 
-                <div>
-                  <span>✦</span>
+                <span className="shared-arrow-v2">
+                  ›
+                </span>
 
-                  <div>
-                    <strong>Minder</strong>
-
-                    <p>Skab minder sammen</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* HØJRE */}
-
-            <div className="couple-date-preview">
-              {newestMemories.length > 0 ? (
-                newestMemories.map((memory) => (
-                  <div className="couple-date-row" key={memory.id}>
-                    <span className="couple-calendar-icon">▣</span>
-
-                    <div>
-                      <strong>{memory.title}</strong>
-
-                      <p>
-                        {memory.date
-                          ? formatDate(memory.date)
-                          : "Dato ikke angivet"}
-                      </p>
-                    </div>
-
-                    <span className="shared-label">Delt</span>
-                  </div>
-                ))
-              ) : (
-                <div className="couple-empty-dates">
-                  <span>♡</span>
-
-                  <p>Jeres tidligere dates vil blive vist her.</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {inviteCode && (
-            <div className="couple-code-row">
-              <div>
-                <span>Jeres partnerkode</span>
-
-                <strong>{inviteCode}</strong>
-              </div>
-
-              <button type="button" onClick={copyCode}>
-                Kopiér
-              </button>
-            </div>
+              </article>
+            )
           )}
-        </section>
-      )}
+
+        </div>
+      </>
+    ) : (
+      /* =====================================
+          INGEN MINDER ENDNU
+      ===================================== */
+
+      <div className="shared-empty-v2">
+
+        <span>♡</span>
+
+        <h3>
+          Jeres første date venter
+        </h3>
+
+        <p>
+          Når I gemmer en tidligere date,
+          bliver den vist her.
+        </p>
+
+      </div>
+    )}
+
+    {/* =====================================
+        PARTNERKODE
+    ===================================== */}
+
+    {inviteCode && (
+      <div className="shared-code-v2">
+
+        <div>
+          <span>
+            Jeres partnerkode
+          </span>
+
+          <strong>
+            {inviteCode}
+          </strong>
+        </div>
+
+        <button
+          type="button"
+          onClick={copyCode}
+        >
+          Kopiér
+        </button>
+
+      </div>
+    )}
+
+  </section>
+)}
 
       {/* BESKED EFTER FORBINDELSE */}
 
