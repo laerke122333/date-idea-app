@@ -111,6 +111,9 @@ function App() {
   const [coupleId, setCoupleId] = useState(null);
   const [inviteCode, setInviteCode] = useState("");
   const [partnerConnected, setPartnerConnected] = useState(false);
+  const [currentProfile, setCurrentProfile] = useState(null);
+
+  const [partnerProfile, setPartnerProfile] = useState(null);
 
   /* MINDER */
 
@@ -160,6 +163,7 @@ function App() {
 
     loadDateIdeas();
     loadSavedDates();
+    loadCurrentProfile();
     loadCouple();
   }, [session]);
 
@@ -290,6 +294,134 @@ function App() {
   }
 
   /* =======================================================
+   HENT EGEN PROFIL
+======================================================= */
+
+  async function loadCurrentProfile() {
+    if (!session?.user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, name, avatar_url")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      setCurrentProfile(data || null);
+    } catch (error) {
+      console.error("Kunne ikke hente profil:", error);
+    }
+  }
+
+  /* =======================================================
+   HENT PARTNERENS PROFIL
+======================================================= */
+
+  async function loadPartnerProfile() {
+    try {
+      const { data, error } = await supabase.rpc("get_my_partner_profile");
+
+      if (error) {
+        throw error;
+      }
+
+      setPartnerProfile(data?.[0] || null);
+    } catch (error) {
+      console.error("Kunne ikke hente partnerprofil:", error);
+
+      setPartnerProfile(null);
+    }
+  }
+
+  /* =======================================================
+   UPLOAD PROFILBILLEDE
+======================================================= */
+
+  async function uploadProfileImage(file) {
+    if (!session?.user) {
+      return {
+        success: false,
+        message: "Du skal være logget ind.",
+      };
+    }
+
+    if (!file) {
+      return {
+        success: false,
+        message: "Vælg et billede.",
+      };
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+      return {
+        success: false,
+        message: "Billedet må højst fylde 3 MB.",
+      };
+    }
+
+    try {
+      const extension = file.name.split(".").pop() || "jpg";
+
+      const filePath = `${session.user.id}/avatar-${Date.now()}.${extension}`;
+
+      /* Upload */
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      /* Få offentlig URL */
+
+      const { data: publicUrlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      const avatarUrl = publicUrlData.publicUrl;
+
+      /* Gem URL på profilen */
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          avatar_url: avatarUrl,
+        })
+        .eq("id", session.user.id);
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      setCurrentProfile((previous) => ({
+        ...(previous || {}),
+        id: session.user.id,
+        avatar_url: avatarUrl,
+      }));
+
+      return {
+        success: true,
+        message: "Profilbilledet er gemt ♡",
+      };
+    } catch (error) {
+      console.error("Profilbillede fejl:", error);
+
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  }
+  /* =======================================================
      HENT COUPLE
   ======================================================= */
 
@@ -358,7 +490,15 @@ function App() {
         return;
       }
 
-      setPartnerConnected(Number(memberCount || 0) >= 2);
+      const connected = Number(memberCount || 0) >= 2;
+
+      setPartnerConnected(connected);
+
+      if (connected) {
+        await loadPartnerProfile();
+      } else {
+        setPartnerProfile(null);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -446,7 +586,9 @@ function App() {
       setCoupleId(null);
       setInviteCode("");
       setPartnerConnected(false);
+      setPartnerProfile(null);
       setMemories([]);
+      
 
       return {
         success: true,
@@ -604,7 +746,7 @@ function App() {
         date: Object.prototype.hasOwnProperty.call(options, "date")
           ? options.date
           : null,
-        image_url: options.image_url || null,
+        image_url: options.image_url || dateIdea.image_url || null,
       });
 
       if (error) {
@@ -753,6 +895,9 @@ function App() {
         {page === "settings" && (
           <SettingsPage
             session={session}
+            currentProfile={currentProfile}
+            partnerProfile={partnerProfile}
+            uploadProfileImage={uploadProfileImage}
             coupleId={coupleId}
             inviteCode={inviteCode}
             partnerConnected={partnerConnected}
@@ -1121,11 +1266,21 @@ function ResultsPage({
 }) {
   return (
     <section className="screen page-with-nav">
+      <button
+        type="button"
+        className="date-results-back"
+        onClick={() => setPage("suggestions")}
+      >
+        ←
+      </button>
+
       <PageHeader
         eyebrow="MATCHET TIL JER"
         title="Jeres date idéer"
         description={`Baseret på ${selectedTags.join(", ")}`}
       />
+
+      {/* resten af siden */}
 
       {results.length === 0 ? (
         <div className="empty">
@@ -1704,7 +1859,7 @@ function SpinPage({
             );
           })}
 
-          <div className="wheel-center">♡</div>
+          <div className="wheel-center"></div>
         </div>
       </div>
 
@@ -1724,7 +1879,7 @@ function SpinPage({
           </button>
 
           <p className="spin-quote">
-            De bedste dates sker nogle gange ved et tilfælde ♡
+            De bedste dates sker nogle gange ved et tilfælde 
           </p>
         </>
       )}
@@ -1781,7 +1936,7 @@ function SpinPage({
           </button>
 
           <p className="spin-again-text">
-            ♡ Vil I hellere have noget andet? Spin igen og få en ny idé.
+             Vil I hellere have noget andet? Spin igen og få en ny idé.
           </p>
         </div>
       )}
@@ -2203,6 +2358,9 @@ function HistoryPage({
 
 function SettingsPage({
   session,
+  currentProfile,
+  partnerProfile,
+  uploadProfileImage,
   coupleId,
   inviteCode,
   partnerConnected,
@@ -2221,6 +2379,10 @@ function SettingsPage({
 
   const [loading, setLoading] = useState(false);
 
+  const [avatarLoading, setAvatarLoading] = useState(false);
+
+  const [avatarMessage, setAvatarMessage] = useState("");
+
   /* =======================================================
      OPRET KODE
   ======================================================= */
@@ -2235,6 +2397,22 @@ function SettingsPage({
 
     setSuccess(result.success);
     setMessage(result.message);
+  }
+
+  async function handleAvatarChange(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    setAvatarLoading(true);
+    setAvatarMessage("");
+
+    const result = await uploadProfileImage(file);
+
+    setAvatarLoading(false);
+    setAvatarMessage(result.message);
+
+    event.target.value = "";
   }
 
   /* =======================================================
@@ -2346,17 +2524,44 @@ function SettingsPage({
 
       {/* PROFIL */}
 
-      <section className="profile-card">
-        <div className="profile-avatar">{getInitial(session?.user)}</div>
+      <section className="profile-card profile-card-with-image">
+        <div className="profile-avatar">
+          {currentProfile?.avatar_url ? (
+            <img src={currentProfile.avatar_url} alt="Dit profilbillede" />
+          ) : (
+            getInitial(session?.user)
+          )}
+        </div>
 
-        <div>
+        <div className="profile-info">
           <span>Logget ind som</span>
 
           <strong>
-            {session?.user?.user_metadata?.name || session?.user?.email}
+            {currentProfile?.name ||
+              session?.user?.user_metadata?.name ||
+              session?.user?.email}
           </strong>
 
           <small>{session?.user?.email}</small>
+
+          <label className="profile-picture-button">
+            {avatarLoading
+              ? "Uploader..."
+              : currentProfile?.avatar_url
+                ? "Skift profilbillede"
+                : "Tilføj profilbillede"}
+
+            <input
+              type="file"
+              accept="image/*"
+              disabled={avatarLoading}
+              onChange={handleAvatarChange}
+            />
+          </label>
+
+          {avatarMessage && (
+            <small className="avatar-message">{avatarMessage}</small>
+          )}
         </div>
       </section>
 
@@ -2487,189 +2692,142 @@ function SettingsPage({
           )}
         </section>
       ) : (
-        
-
-  /* =================================================
+        /* =================================================
      3. PARTNER FORBUNDET - FÆLLES SIDE
   ================================================= */
 
-  <section className="shared-page-card-v2">
+        <section className="shared-page-card-v2">
+          {/* TOP */}
 
-    {/* TOP */}
+          <div className="shared-page-top-v2">
+            <div>
+              <h2>Fælles side</h2>
 
-    <div className="shared-page-top-v2">
-      <div>
-        <h2>Fælles side</h2>
+              <p>Jeres seneste dates samlet ét sted</p>
+            </div>
 
-        <p>
-          Jeres seneste dates samlet ét sted
-        </p>
-      </div>
+            <div className="shared-avatar-v2">
+              {currentProfile?.avatar_url ? (
+                <img src={currentProfile.avatar_url} alt="Dit profilbillede" />
+              ) : (
+                getInitial(session?.user)
+              )}
+            </div>
 
-      <div className="shared-page-avatars-v2">
-        <div className="shared-avatar-v2">
-          {getInitial(session?.user)}
-        </div>
+            <span className="shared-heart-v2">♥</span>
 
-        <span className="shared-heart-v2">
-          ♥
-        </span>
+            <div className="shared-avatar-v2 partner">
+              {partnerProfile?.avatar_url ? (
+                <img
+                  src={partnerProfile.avatar_url}
+                  alt="Din partners profilbillede"
+                />
+              ) : partnerProfile?.name ? (
+                partnerProfile.name.charAt(0).toUpperCase()
+              ) : (
+                "♡"
+              )}
+            </div>
+          </div>
 
-        <div className="shared-avatar-v2 partner">
-          ♡
-        </div>
-      </div>
-    </div>
-
-    {/* =====================================
+          {/* =====================================
         STORT FREMHÆVET MINDE
     ===================================== */}
 
-    {featuredMemory ? (
-      <>
-        <article className="shared-featured-v2">
+          {featuredMemory ? (
+            <>
+              <article className="shared-featured-v2">
+                <div className="shared-featured-image-v2">
+                  {featuredMemory.image_url ? (
+                    <img
+                      src={featuredMemory.image_url}
+                      alt={featuredMemory.title}
+                    />
+                  ) : (
+                    <div className="shared-image-placeholder-v2">♡</div>
+                  )}
+                </div>
 
-          <div className="shared-featured-image-v2">
-            {featuredMemory.image_url ? (
-              <img
-                src={featuredMemory.image_url}
-                alt={featuredMemory.title}
-              />
-            ) : (
-              <div className="shared-image-placeholder-v2">
-                ♡
-              </div>
-            )}
-          </div>
+                <div className="shared-featured-info-v2">
+                  <div className="shared-calendar-v2">▣</div>
 
-          <div className="shared-featured-info-v2">
+                  <div className="shared-featured-text-v2">
+                    <h3>{featuredMemory.title}</h3>
 
-            <div className="shared-calendar-v2">
-              ▣
-            </div>
+                    <p>
+                      {featuredMemory.date
+                        ? formatDate(featuredMemory.date)
+                        : "Dato ikke angivet"}
+                    </p>
+                  </div>
 
-            <div className="shared-featured-text-v2">
-              <h3>
-                {featuredMemory.title}
-              </h3>
+                  <span className="shared-arrow-v2">›</span>
+                </div>
+              </article>
 
-              <p>
-                {featuredMemory.date
-                  ? formatDate(
-                      featuredMemory.date
-                    )
-                  : "Dato ikke angivet"}
-              </p>
-            </div>
-
-            <span className="shared-arrow-v2">
-              ›
-            </span>
-
-          </div>
-
-        </article>
-
-        {/* =====================================
+              {/* =====================================
             DE NÆSTE DATES
         ===================================== */}
 
-        <div className="shared-memory-list-v2">
+              <div className="shared-memory-list-v2">
+                {otherMemories.map((memory) => (
+                  <article className="shared-memory-row-v2" key={memory.id}>
+                    <div className="shared-memory-thumb-v2">
+                      {memory.image_url ? (
+                        <img src={memory.image_url} alt={memory.title} />
+                      ) : (
+                        <span>♡</span>
+                      )}
+                    </div>
 
-          {otherMemories.map(
-            (memory) => (
-              <article
-                className="shared-memory-row-v2"
-                key={memory.id}
-              >
+                    <div className="shared-memory-text-v2">
+                      <h3>{memory.title}</h3>
 
-                <div className="shared-memory-thumb-v2">
+                      <p>
+                        {memory.date
+                          ? formatDate(memory.date)
+                          : "Dato ikke angivet"}
+                      </p>
+                    </div>
 
-                  {memory.image_url ? (
-                    <img
-                      src={memory.image_url}
-                      alt={memory.title}
-                    />
-                  ) : (
-                    <span>♡</span>
-                  )}
-
-                </div>
-
-                <div className="shared-memory-text-v2">
-                  <h3>
-                    {memory.title}
-                  </h3>
-
-                  <p>
-                    {memory.date
-                      ? formatDate(
-                          memory.date
-                        )
-                      : "Dato ikke angivet"}
-                  </p>
-                </div>
-
-                <span className="shared-arrow-v2">
-                  ›
-                </span>
-
-              </article>
-            )
-          )}
-
-        </div>
-      </>
-    ) : (
-      /* =====================================
+                    <span className="shared-arrow-v2">›</span>
+                  </article>
+                ))}
+              </div>
+            </>
+          ) : (
+            /* =====================================
           INGEN MINDER ENDNU
       ===================================== */
 
-      <div className="shared-empty-v2">
+            <div className="shared-empty-v2">
+              <span>♡</span>
 
-        <span>♡</span>
+              <h3>Jeres første date venter</h3>
 
-        <h3>
-          Jeres første date venter
-        </h3>
+              <p>Når I gemmer en tidligere date, bliver den vist her.</p>
+            </div>
+          )}
 
-        <p>
-          Når I gemmer en tidligere date,
-          bliver den vist her.
-        </p>
-
-      </div>
-    )}
-
-    {/* =====================================
+          {/* =====================================
         PARTNERKODE
     ===================================== */}
 
-    {inviteCode && (
-      <div className="shared-code-v2">
+          {inviteCode && (
+            <div className="shared-code-v2">
+              <div>
+                <span>Jeres partnerkode</span>
 
-        <div>
-          <span>
-            Jeres partnerkode
-          </span>
+                <strong>{inviteCode}</strong>
+              </div>
 
-          <strong>
-            {inviteCode}
-          </strong>
-        </div>
-
-        <button
-          type="button"
-          onClick={copyCode}
-        >
-          Kopiér
-        </button>
-
-      </div>
-    )}
-
-  </section>
-)}
+              <button type="button" onClick={copyCode}>
+                Kopiér
+              </button>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* BESKED EFTER FORBINDELSE */}
 
