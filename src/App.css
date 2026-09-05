@@ -825,59 +825,159 @@ p {
   gap: 13px;
 }
 
-.memory-card {
-  overflow: hidden;
+/* =========================================================
+   TIDLIGERE MINDER - ENS KORT
+========================================================= */
 
-  border-radius: 20px;
-
-  background:
-    rgba(255, 255, 255, 0.82);
-
-  box-shadow:
-    0 9px 24px
-      rgba(115, 57, 76, 0.08);
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
 }
 
+/* SELVE KORTET */
+
+.memory-card {
+  width: 100%;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  border: 0;
+  border-radius: 24px;
+
+  background: white;
+
+  text-align: left;
+
+  box-shadow:
+    0 8px 24px
+    rgba(100, 55, 72, 0.08);
+
+  cursor: pointer;
+}
+
+/* BILLEDET */
+
 .memory-image {
-  height: 150px;
+  width: 100%;
+  height: 260px;
+
+  overflow: hidden;
 
   display: grid;
-
   place-items: center;
 
-  color: var(--pink);
-
-  background: #f9dce6;
-
-  font-size: 40px;
+  background: #f8e3ea;
 }
 
 .memory-image img {
   width: 100%;
-
   height: 100%;
+
+  display: block;
 
   object-fit: cover;
 }
 
+/* HVIS DER IKKE ER BILLEDE */
+
+.memory-image > span {
+  color: var(--pink);
+
+  font-size: 44px;
+}
+
+/* TEKSTDELEN */
+
 .memory-content {
-  padding: 13px;
+  min-height: 135px;
+
+  padding: 18px 20px 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  background: white;
 }
 
 .memory-content h3 {
-  margin-bottom: 6px;
+  margin: 0 0 8px;
 
-  font-size: 17px;
+  color: var(--text);
+
+  font-family:
+    "Playfair Display",
+    serif;
+
+  font-size: 25px;
+  font-weight: 500;
+
+  line-height: 1.1;
+
+  word-break: break-word;
 }
 
 .memory-content p {
-  margin: 0;
+  margin: 0 0 14px;
 
-  color: #a15d75;
+  color: #a55c74;
 
-  font-size: 11px;
+  font-size: 13px;
 }
 
+.memory-open-text {
+  margin-top: auto;
+
+  color: var(--pink);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* HOVER */
+
+.memory-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 28px
+    rgba(100, 55, 72, 0.12);
+}
+
+/* =========================================================
+   MOBIL
+========================================================= */
+
+@media (max-width: 380px) {
+  .memory-grid {
+    gap: 12px;
+  }
+
+  .memory-image {
+    height: 210px;
+  }
+
+  .memory-content {
+    min-height: 120px;
+    padding: 14px;
+  }
+
+  .memory-content h3 {
+    font-size: 20px;
+  }
+
+  .memory-content p {
+    font-size: 11px;
+  }
+
+  .memory-open-text {
+    font-size: 10px;
+  }
+}
 .empty-small {
   padding: 60px 20px;
 
@@ -3112,7 +3212,7 @@ p {
         51.428deg
         102.856deg,
 
-      #f3cbd8
+      #fabed1
         102.856deg
         154.284deg,
 
@@ -3120,7 +3220,7 @@ p {
         154.284deg
         205.712deg,
 
-      #dfc8e3
+      #d1d5f8
         205.712deg
         257.14deg,
 
@@ -3128,46 +3228,13 @@ p {
         257.14deg
         308.568deg,
 
-      #e4c5e9
+      #c5d8e9
         308.568deg
         360deg
     );
 }
 
 
-/* LINJER MELLEM FELTER */
-
-.date-wheel::before {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  z-index: 2;
-
-  border-radius: 50%;
-
-  background:
-    repeating-conic-gradient(
-      from -0.7deg,
-
-      rgba(
-        255,
-        255,
-        255,
-        0.85
-      )
-      0deg
-      1.4deg,
-
-      transparent
-      1.4deg
-      51.428deg
-    );
-
-  pointer-events: none;
-}
 
 
 /* =========================================================
@@ -4140,4 +4207,69 @@ p {
 .date-results-back:hover {
   transform: translateX(-2px);
   background: white;
+}
+
+/* =========================================================
+   DATE - LOKATIONSFORSLAG
+========================================================= */
+
+.date-location-suggestion {
+  width: 100%;
+
+  margin: 16px 0 20px;
+  padding: 15px 16px;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+
+  border: 1px solid #efd0db;
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.72);
+}
+
+.date-location-pin {
+  width: 37px;
+  height: 37px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  background: #fde7ef;
+
+  font-size: 18px;
+}
+
+.date-location-suggestion > div {
+  min-width: 0;
+}
+
+.date-location-suggestion small {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #b16b83;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.date-location-suggestion p {
+  margin: 0;
+
+  color: var(--text);
+
+  font-size: 12px;
+  line-height: 1.5;
 }

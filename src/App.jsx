@@ -356,11 +356,9 @@ function App() {
       };
     }
 
-    if (file.size > 3 * 1024 * 1024) {
-      return {
-        success: false,
-        message: "Billedet må højst fylde 3 MB.",
-      };
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage("Vælg et billede under 10 MB.");
+      return;
     }
 
     try {
@@ -1397,8 +1395,8 @@ function DetailsPage({
 
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      setTriedMessage("Vælg et billede under 2 MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      setTriedMessage("Vælg et billede under 10 MB.");
       return;
     }
 
@@ -1497,6 +1495,18 @@ function DetailsPage({
         </div>
 
         <h1>{date.title}</h1>
+
+        {date.location_suggestion && (
+          <div className="date-location-suggestion">
+            <span className="date-location-pin">📍</span>
+
+            <div>
+              <small>Forslag til lokation</small>
+
+              <p>{cleanLocationSuggestion(date.location_suggestion)}</p>
+            </div>
+          </div>
+        )}
 
         <p className="description">{date.description}</p>
 
@@ -2018,9 +2028,8 @@ function HistoryPage({
 
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      setMessage("Vælg et billede under 2 MB.");
-
+    if (file.size > 10 * 1024 * 1024) {
+      setTriedMessage("Vælg et billede under 10 MB.");
       return;
     }
 
@@ -2948,6 +2957,14 @@ function BottomNav({ page, setPage }) {
   );
 }
 
+function cleanLocationSuggestion(location) {
+  if (!location) return "";
+
+  return location
+    .replace(/^Forslag i Aarhus:\s*/i, "")
+    .replace(/^Forslag nær Aarhus:\s*/i, "Nær Aarhus: ")
+    .replace(/^Forslag:\s*/i, "");
+}
 /* =========================================================
    HELPERS
 ========================================================= */
