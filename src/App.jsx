@@ -87,7 +87,37 @@ const demoDates = [
    APP
 ========================================================= */
 
+function getActiveNavPage(page, detailsBackPage) {
+  if (
+    page === "suggestions" ||
+    page === "loading" ||
+    page === "results"
+  ) {
+    return "frontpage";
+  }
+
+  if (page === "details") {
+    if (detailsBackPage === "saved") {
+      return "saved";
+    }
+
+    if (detailsBackPage === "spin") {
+      return "spin";
+    }
+
+    return "frontpage";
+  }
+
+  return page;
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
 function App() {
+
   /* AUTH */
 
   const [session, setSession] = useState(null);
@@ -357,8 +387,10 @@ function App() {
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setMessage("Vælg et billede under 10 MB.");
-      return;
+      return {
+        success: false,
+        message: "Vælg et billede under 10 MB.",
+      };
     }
 
     try {
@@ -814,12 +846,13 @@ function App() {
   }
 
   /* =======================================================
-     APP
-  ======================================================= */
+   APP
+======================================================= */
 
   return (
     <main className="app">
       <div className="phone">
+
         {page === "frontpage" && (
           <FrontPage
             setPage={setPage}
@@ -838,13 +871,17 @@ function App() {
           />
         )}
 
-        {page === "loading" && <LoadingPage />}
+        {page === "loading" && (
+          <LoadingPage />
+        )}
 
         {page === "results" && (
           <ResultsPage
             results={results}
             selectedTags={selectedTags}
-            openDate={(date) => openDate(date, "results")}
+            openDate={(date) =>
+              openDate(date, "results")
+            }
             savedDates={savedDates}
             toggleSaved={toggleSaved}
             setPage={setPage}
@@ -873,7 +910,9 @@ function App() {
         {page === "spin" && (
           <SpinPage
             dateIdeas={dateIdeas}
-            openDate={(date) => openDate(date, "spin")}
+            openDate={(date) =>
+              openDate(date, "spin")
+            }
             savedDates={savedDates}
             toggleSaved={toggleSaved}
           />
@@ -885,8 +924,10 @@ function App() {
             addMemory={addMemory}
             deleteMemory={deleteMemory}
             memoryLoading={memoryLoading}
-            hasCouple={Boolean(coupleId)}
-            goToSettings={() => setPage("settings")}
+            hasCouple={partnerConnected}
+            goToSettings={() =>
+              setPage("settings")
+            }
           />
         )}
 
@@ -908,16 +949,23 @@ function App() {
           />
         )}
 
-        {["frontpage", "saved", "spin", "history", "settings"].includes(
-          page,
-        ) && <BottomNav page={page} setPage={setPage} />}
+        {/* =============================================
+            NAVBAR - VISES PÅ ALLE SIDER EFTER LOGIN
+        ============================================= */}
+
+        <BottomNav
+          page={getActiveNavPage(page, detailsBackPage)}
+          setPage={setPage}
+        />
+
       </div>
     </main>
   );
 }
 
+
 /* =========================================================
-   LOGIN
+   LOGIN / OPRET BRUGER
 ========================================================= */
 
 function AuthPage() {
@@ -927,10 +975,9 @@ function AuthPage() {
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
-
   const [message, setMessage] = useState("");
-
   const [success, setSuccess] = useState(false);
+
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -940,133 +987,206 @@ function AuthPage() {
     setSuccess(false);
 
     try {
+      /* OPRET BRUGER */
+
       if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              name,
+        const { data, error } =
+          await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name,
+              },
             },
-          },
-        });
+          });
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
 
-        if (!data.session) {
-          setSuccess(true);
+        setSuccess(true);
 
-          setMessage(
-            "Din bruger er oprettet. Tjek din email for at bekræfte kontoen ♡",
-          );
-
-          setLoading(false);
-          return;
+        if (data.session) {
+          setMessage("Din bruger er oprettet ♡");
+        } else {
+          setMessage("Din bruger er oprettet.");
         }
       }
 
+
+      /* LOG IND */
+
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } =
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
       }
-    } catch (error) {
-      setMessage(translateAuthError(error.message));
-    }
 
-    setLoading(false);
+    } catch (error) {
+      setSuccess(false);
+
+      setMessage(
+        translateAuthError(error.message)
+      );
+    } finally {
+      setLoading(false);
+    }
   }
+
 
   return (
     <section className="auth-page">
-      <div className="auth-logo">♡</div>
 
-      <span className="eyebrow">DATE IDEAS</span>
+      <div className="auth-logo">
+        ♡
+      </div>
 
-      <h1>{mode === "login" ? "Velkommen tilbage" : "Opret din profil"}</h1>
+      <span className="eyebrow">
+        DATE IDEAS
+      </span>
+
+      <h1>
+        {mode === "login"
+          ? "Velkommen tilbage"
+          : "Opret din profil"}
+      </h1>
 
       <p className="auth-description">
         Find dates, gem jeres minder og skab en fælles side med din partner.
       </p>
 
+
+      {/* LOGIN / OPRET TABS */}
+
       <div className="auth-tabs">
+
         <button
           type="button"
-          className={mode === "login" ? "active" : ""}
+          className={
+            mode === "login"
+              ? "active"
+              : ""
+          }
           onClick={() => {
             setMode("login");
             setMessage("");
+            setSuccess(false);
           }}
         >
           Log ind
         </button>
 
+
         <button
           type="button"
-          className={mode === "signup" ? "active" : ""}
+          className={
+            mode === "signup"
+              ? "active"
+              : ""
+          }
           onClick={() => {
             setMode("signup");
             setMessage("");
+            setSuccess(false);
           }}
         >
           Opret bruger
         </button>
+
       </div>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+
+      {/* FORM */}
+
+      <form
+        className="auth-form"
+        onSubmit={handleSubmit}
+      >
+
         {mode === "signup" && (
           <label>
             Dit navn
+
             <input
               type="text"
               value={name}
               required
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) =>
+                setName(event.target.value)
+              }
             />
           </label>
         )}
 
+
         <label>
           Email
+
           <input
             type="email"
             value={email}
             required
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) =>
+              setEmail(event.target.value)
+            }
           />
         </label>
 
+
         <label>
           Adgangskode
+
           <input
             type="password"
             value={password}
             required
             minLength={6}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) =>
+              setPassword(event.target.value)
+            }
           />
         </label>
 
+
         {message && (
-          <div className={`auth-message ${success ? "success" : "error"}`}>
+          <div
+            className={`auth-message ${
+              success
+                ? "success"
+                : "error"
+            }`}
+          >
             {message}
           </div>
         )}
 
-        <button className="primary" type="submit" disabled={loading}>
+
+        <button
+          className="primary"
+          type="submit"
+          disabled={loading}
+        >
           {loading
             ? "Vent lidt..."
             : mode === "login"
               ? "Log ind"
               : "Opret bruger"}
         </button>
+
       </form>
+
     </section>
   );
 }
+
+
 
 /* =========================================================
    FORSIDE
@@ -1356,6 +1476,14 @@ function DateCard({ date, saved, openDate, toggleSaved }) {
   );
 }
 
+function cleanLocationSuggestion(location) {
+  if (!location) return "";
+
+  return location
+    .replace(/^Forslag i Aarhus:\s*/i, "")
+    .replace(/^Forslag nær Aarhus:\s*/i, "Nær Aarhus: ")
+    .replace(/^Forslag:\s*/i, "");
+}
 /* =========================================================
    DETAILS
 ========================================================= */
@@ -1816,7 +1944,7 @@ function SpinPage({
 
         {!spinResult ? (
           <>
-            <h1>Lad skæbnen bestemme ♡</h1>
+            <h1>Lad skæbnen bestemme</h1>
 
             <p>Spin hjulet og få en tilfældig dateidé.</p>
           </>
@@ -2029,7 +2157,7 @@ function HistoryPage({
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      setTriedMessage("Vælg et billede under 10 MB.");
+      setMessage("Vælg et billede under 10 MB.");
       return;
     }
 
@@ -2911,59 +3039,230 @@ function PageHeader({ eyebrow, title, description }) {
 
 function BottomNav({ page, setPage }) {
   const navigation = [
-  {
-    id: "frontpage",
-    label: "Forside",
-    icon: "⌂",
-  },
-  {
-    id: "saved",
-    label: "Gemte",
-    icon: "♡",
-  },
-  {
-    id: "spin",
-    label: "Spin",
-    icon: "◉",
-  },
-  {
-    id: "history",
-    label: "Tidligere",
-    icon: "♥",
-  },
-  {
-    id: "settings",
-    label: "Indstillinger",
-    icon: "⚙",
-  },
-];
-  
+    {
+      id: "frontpage",
+      label: "Forside",
+      icon: "home",
+    },
+    {
+      id: "saved",
+      label: "Gemte",
+      icon: "heart",
+    },
+    {
+      id: "spin",
+      label: "Spin",
+      icon: "sparkle",
+      special: true,
+    },
+    {
+      id: "history",
+      label: "Tidligere",
+      icon: "history",
+    },
+    {
+      id: "settings",
+      label: "Profil",
+      icon: "profile",
+    },
+  ];
 
   return (
-    <nav className="bottom-nav">
-      {navigation.map((item) => (
-        <button
-          type="button"
-          key={item.id}
-          className={page === item.id ? "active" : ""}
-          onClick={() => setPage(item.id)}
-        >
-          <span>{item.icon}</span>
+    <nav className="bottom-nav-new">
+      {navigation.map((item, index) => {
+        const active = page === item.id;
 
-          <small>{item.label}</small>
-        </button>
-      ))}
+        return (
+          <div
+            className={`bottom-nav-item-wrapper ${
+              item.special ? "spin-wrapper" : ""
+            }`}
+            key={item.id}
+          >
+            {index > 0 && (
+              <span className="bottom-nav-divider" />
+            )}
+
+            <button
+              type="button"
+              className={`bottom-nav-item ${
+                active ? "active" : ""
+              } ${
+                item.special
+                  ? "spin-nav-item"
+                  : ""
+              }`}
+              onClick={() =>
+                setPage(item.id)
+              }
+            >
+              <span className="bottom-nav-icon">
+                <BottomNavIcon
+                  type={item.icon}
+                  active={active}
+                />
+              </span>
+
+              <span className="bottom-nav-label">
+                {item.label}
+              </span>
+
+              {active &&
+                !item.special && (
+                  <span className="bottom-nav-active-line" />
+                )}
+            </button>
+          </div>
+        );
+      })}
     </nav>
   );
 }
 
-function cleanLocationSuggestion(location) {
-  if (!location) return "";
 
-  return location
-    .replace(/^Forslag i Aarhus:\s*/i, "")
-    .replace(/^Forslag nær Aarhus:\s*/i, "Nær Aarhus: ")
-    .replace(/^Forslag:\s*/i, "");
+/* =========================================================
+   BOTTOM NAV ICONS
+========================================================= */
+
+function BottomNavIcon({
+  type,
+  active,
+}) {
+  const stroke =
+    active ? "#ec3f78" : "#776e72";
+
+  const fill =
+    active ? "#ec3f78" : "none";
+
+  /* FORSIDE */
+
+  if (type === "home") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M3.5 10.5L12 3l8.5 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-5v-6h-4v6H5a1.5 1.5 0 0 1-1.5-1.5z"
+          fill={fill}
+          stroke={stroke}
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  /* GEMTE */
+
+  if (type === "heart") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.5 1-1a5.5 5.5 0 0 0 0-7.8z"
+          fill={active ? "#ec3f78" : "none"}
+          stroke={stroke}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  /* SPIN */
+
+  if (type === "sparkle") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 2.7c.7 5.8 3.5 8.6 9.3 9.3-5.8.7-8.6 3.5-9.3 9.3-.7-5.8-3.5-8.6-9.3-9.3 5.8-.7 8.6-3.5 9.3-9.3z"
+          fill="white"
+        />
+      </svg>
+    );
+  }
+
+  /* TIDLIGERE */
+
+  if (type === "history") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M4.5 7.5A8.5 8.5 0 1 1 3.8 14"
+          fill="none"
+          stroke={stroke}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+
+        <path
+          d="M4.5 3.8v4.5H9"
+          fill="none"
+          stroke={stroke}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        <path
+          d="M12 7v5l3.2 2"
+          fill="none"
+          stroke={stroke}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  /* PROFIL */
+
+  if (type === "profile") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="7.5"
+          r="3.5"
+          fill={
+            active
+              ? "#ec3f78"
+              : "none"
+          }
+          stroke={stroke}
+          strokeWidth="1.8"
+        />
+
+        <path
+          d="M5 21v-2.2c0-3.3 2.7-5.8 6-5.8h2c3.3 0 6 2.5 6 5.8V21z"
+          fill={
+            active
+              ? "#ec3f78"
+              : "none"
+          }
+          stroke={stroke}
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  return null;
 }
 /* =========================================================
    HELPERS

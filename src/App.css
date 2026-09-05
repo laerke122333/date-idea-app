@@ -1433,69 +1433,6 @@ p {
   letter-spacing: 1.5px;
 }
 
-/* NAVIGATION */
-
-.bottom-nav {
-  width: 100%;
-
-  max-width: 430px;
-
-  height: 86px;
-
-  padding:
-    9px 8px 13px;
-
-  position: fixed;
-
-  z-index: 20;
-
-  bottom: 0;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, 1fr);
-
-  border-top:
-    1px solid
-      rgba(230, 179, 197, 0.6);
-
-  background:
-    rgba(255, 250, 252, 0.94);
-
-  backdrop-filter: blur(17px);
-}
-
-.bottom-nav button {
-  display: flex;
-
-  flex-direction: column;
-
-  justify-content: center;
-
-  align-items: center;
-
-  gap: 3px;
-
-  border: 0;
-
-  color: #746b6e;
-
-  background: transparent;
-}
-
-.bottom-nav button span {
-  font-size: 25px;
-}
-
-.bottom-nav button small {
-  font-size: 10px;
-}
-
-.bottom-nav button.active {
-  color: var(--pink);
-}
-
 /* DESKTOP */
 
 @media (min-width: 600px) {
@@ -1519,12 +1456,6 @@ p {
       calc(100vh - 50px);
   }
 
-  .bottom-nav {
-    bottom: 25px;
-
-    border-radius:
-      0 0 35px 35px;
-  }
 }
 
 /* ======================
@@ -2265,7 +2196,6 @@ p {
 
   line-height: 1.45;
 }
-
 /* TILBAGEKNAP PÅ STEMNINGSSIDEN */
 
 .suggestions-back {
@@ -3497,7 +3427,7 @@ p {
 
   line-height: 1.45;
 
-  -webkit-line-clamp: 3;
+  
   -webkit-box-orient: vertical;
 }
 
@@ -3585,24 +3515,6 @@ p {
 }
 
 
-/* =========================================================
-   BOTTOM NAV MED 5 KNAPPER
-========================================================= */
-
-.bottom-nav {
-  grid-template-columns:
-    repeat(
-      5,
-      1fr
-    );
-}
-
-
-/* GØR SPIN LIDT MERE TYDELIG */
-
-.bottom-nav button.active span {
-  color: var(--pink);
-}
 
 
 /* =========================================================
@@ -4272,4 +4184,340 @@ p {
 
   font-size: 12px;
   line-height: 1.5;
+}
+
+/* =========================================================
+   BOTTOM NAV – STILRENT FORSLAG 3
+   Forside · Gemte · Spin · Tidligere · Profil
+========================================================= */
+
+.bottom-nav-new {
+  width: calc(100% - 28px);
+  max-width: 402px;
+  height: 78px;
+
+  position: fixed;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 1000;
+
+  transform: translateX(-50%);
+
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+
+  padding: 7px 8px;
+
+  border: 1px solid rgba(236, 207, 217, 0.92);
+  border-radius: 27px;
+
+  background: rgba(255, 252, 253, 0.97);
+
+  box-shadow:
+    0 10px 28px rgba(93, 52, 67, 0.11);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* HVERT MENUPUNKT */
+
+.bottom-nav-item-wrapper {
+  height: 62px;
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* TYNDE SKILLELINJER */
+
+.bottom-nav-divider {
+  width: 1px;
+  height: 37px;
+
+  position: absolute;
+  top: 50%;
+  left: 0;
+
+  transform: translateY(-50%);
+
+  background: #efd9e1;
+
+  pointer-events: none;
+}
+
+
+/* KNAPPER */
+
+.bottom-nav-item {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: 0;
+
+  color: #746b6f;
+  background: transparent;
+
+  font-family: "DM Sans", sans-serif;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* IKONER */
+
+.bottom-nav-icon {
+  width: 25px;
+  height: 25px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  transition:
+    transform 0.18s ease;
+}
+
+.bottom-nav-icon svg {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+}
+
+
+/* LABELS */
+
+.bottom-nav-label {
+  color: #746b6f;
+
+  font-size: 9.5px;
+  font-weight: 500;
+
+  line-height: 1;
+
+  transition:
+    color 0.18s ease;
+}
+
+
+/* AKTIV SIDE */
+
+.bottom-nav-item.active .bottom-nav-label {
+  color: var(--pink);
+
+  font-weight: 600;
+}
+
+.bottom-nav-active-line {
+  width: 29px;
+  height: 3px;
+
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+
+  transform: translateX(-50%);
+
+  border-radius: 999px;
+
+  background: var(--pink);
+}
+
+
+/* =========================================================
+   SPIN
+   Samme linje som de andre ikoner
+========================================================= */
+
+.spin-wrapper {
+  z-index: 1;
+}
+
+.spin-nav-item {
+  justify-content: center;
+}
+
+
+/* ROSA SPIN-CIRKEL */
+
+.spin-nav-item .bottom-nav-icon {
+  width: 34px;
+  height: 34px;
+
+  position: static;
+
+  padding: 9px;
+
+  transform: none;
+
+  border: 0;
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ee82a5,
+      #df527f
+    );
+
+  box-shadow:
+    0 4px 10px rgba(210, 69, 116, 0.16);
+}
+
+.spin-nav-item .bottom-nav-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.spin-nav-item .bottom-nav-label {
+  margin: 0;
+
+  color: #665d61;
+
+  font-size: 9.5px;
+  font-weight: 500;
+}
+
+.spin-nav-item.active .bottom-nav-label {
+  color: var(--pink);
+
+  font-weight: 600;
+}
+
+/* Spin får også en lille aktiv streg */
+
+.spin-nav-item.active::after {
+  content: "";
+
+  width: 29px;
+  height: 3px;
+
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+
+  transform: translateX(-50%);
+
+  border-radius: 999px;
+
+  background: var(--pink);
+}
+
+
+/* HOVER PÅ COMPUTER */
+
+@media (hover: hover) {
+  .bottom-nav-item:not(.spin-nav-item):hover
+  .bottom-nav-icon {
+    transform: translateY(-1px);
+  }
+
+  .bottom-nav-item:not(.spin-nav-item):hover
+  .bottom-nav-label {
+    color: var(--pink);
+  }
+
+  .spin-nav-item:hover
+  .bottom-nav-icon {
+    transform: scale(1.04);
+  }
+}
+
+
+/* =========================================================
+   MINDRE MOBILER
+========================================================= */
+
+@media (max-width: 380px) {
+  .bottom-nav-new {
+    width: calc(100% - 18px);
+    height: 74px;
+
+    bottom: max(9px, env(safe-area-inset-bottom));
+
+    padding: 6px 4px;
+
+    border-radius: 25px;
+  }
+
+  .bottom-nav-item-wrapper {
+    height: 58px;
+  }
+
+  .bottom-nav-icon {
+    width: 23px;
+    height: 23px;
+  }
+
+  .bottom-nav-label {
+    font-size: 8.5px;
+  }
+
+  .bottom-nav-divider {
+    height: 34px;
+  }
+
+  .spin-nav-item .bottom-nav-icon {
+    width: 32px;
+    height: 32px;
+
+    padding: 8px;
+  }
+
+  .spin-nav-item .bottom-nav-label {
+    font-size: 8.5px;
+  }
+
+  .bottom-nav-active-line,
+  .spin-nav-item.active::after {
+    width: 26px;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP / APP-RAMME
+========================================================= */
+
+@media (min-width: 600px) {
+  .bottom-nav-new {
+    bottom: 38px;
+  }
+}
+
+/* =========================================================
+   PLADS TIL NAVBAR PÅ ALLE SIDER
+========================================================= */
+
+.details-content {
+  padding-bottom: 130px;
+}
+
+.loading-page {
+  padding-bottom: 130px;
+}
+
+.home-page {
+  padding-bottom: 130px;
 }
