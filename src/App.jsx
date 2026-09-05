@@ -16,14 +16,99 @@ const moodOptions = [
 ];
 
 const wheelCategories = [
-  { label: "Romantisk", icon: "♡" },
-  { label: "Sjovt", icon: "☺" },
-  { label: "Hjemme", icon: "⌂" },
-  { label: "Udendørs", icon: "♧" },
-  { label: "Billigt", icon: "◉" },
-  { label: "Kreativt", icon: "☆" },
-  { label: "Hyggeligt", icon: "☕" },
+  { label: "Romantisk", icon: "heart" },
+  { label: "Sjovt", icon: "smile" },
+  { label: "Hjemme", icon: "home" },
+  { label: "Udendørs", icon: "leaf" },
+  { label: "Billigt", icon: "tag" },
+  { label: "Kreativt", icon: "sparkle" },
+  { label: "Hyggeligt", icon: "coffee" },
 ];
+
+function WheelIcon({ type }) {
+  const commonProps = {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.7",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+  };
+
+  /* ROMANTISK */
+  if (type === "heart") {
+    return (
+      <svg {...commonProps}>
+        <path d="M20.8 4.8a5.3 5.3 0 0 0-7.5 0L12 6.1l-1.3-1.3a5.3 5.3 0 0 0-7.5 7.5L12 21l8.8-8.7a5.3 5.3 0 0 0 0-7.5Z" />
+      </svg>
+    );
+  }
+
+  if (type === "smile") {
+  return (
+    <svg {...commonProps}>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="9" cy="10" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="10" r="1.1" fill="currentColor" stroke="none" />
+      <path d="M8.5 14.2c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2" />
+    </svg>
+  );
+}
+
+  /* HJEMME */
+  if (type === "home") {
+    return (
+      <svg {...commonProps}>
+        <path d="M4 10.5 12 4l8 6.5V20H5a1 1 0 0 1-1-1v-8.5Z" />
+        <path d="M9.5 20v-5.5h5V20" />
+      </svg>
+    );
+  }
+
+  /* UDENDØRS */
+  if (type === "leaf") {
+    return (
+      <svg {...commonProps}>
+        <path d="M19.5 4.5C12 4.7 6.7 8.3 5.3 13.2c-.7 2.5.6 4.7 3.1 5.1 5.1.8 9.6-4.7 11.1-13.8Z" />
+        <path d="M5 20c2.4-4.6 5.8-7.8 10.7-10.2" />
+      </svg>
+    );
+  }
+
+  /* BILLIGT */
+  if (type === "tag") {
+    return (
+      <svg {...commonProps}>
+        <path d="M4.5 5.5h7.2l7.8 7.8-6.2 6.2-7.8-7.8V5.5Z" />
+        <circle cx="8.5" cy="9" r="1.2" />
+      </svg>
+    );
+  }
+
+  /* KREATIVT */
+  if (type === "sparkle") {
+    return (
+      <svg {...commonProps}>
+        <path d="M12 3.5c.7 5.2 3.3 7.8 8.5 8.5-5.2.7-7.8 3.3-8.5 8.5-.7-5.2-3.3-7.8-8.5-8.5 5.2-.7 7.8-3.3 8.5-8.5Z" />
+      </svg>
+    );
+  }
+
+  /* HYGGELIGT */
+  if (type === "coffee") {
+    return (
+      <svg {...commonProps}>
+        <path d="M5 9h11v6.2A3.8 3.8 0 0 1 12.2 19H8.8A3.8 3.8 0 0 1 5 15.2V9Z" />
+        <path d="M16 11h1.8a2.2 2.2 0 0 1 0 4.4H16" />
+        <path d="M8 6.5c-1-1 .8-1.8 0-3" />
+        <path d="M12 6.5c-1-1 .8-1.8 0-3" />
+      </svg>
+    );
+  }
+
+  return null;
+}
 
 /* Tilfældig værdi uden modulo-bias */
 function randomIndex(max) {
@@ -1989,9 +2074,11 @@ function SpinPage({
                     transform: `translateY(-123px) rotate(${-angle}deg)`,
                   }}
                 >
-                  <span>{category.icon}</span>
+                 <span className="wheel-category-icon">
+  <WheelIcon type={category.icon} />
+</span>
 
-                  <small>{category.label}</small>
+<small>{category.label}</small>
                 </div>
               </div>
             );
