@@ -998,16 +998,17 @@ function App() {
           />
         )}
 
-        {page === "frontpage" && (
-          <FrontPage
-            setPage={setPage}
-            savedDates={savedDates}
+        {page === "history" && (
+          <HistoryPage
             memories={memories}
-            hasPartner={partnerConnected}
+            addMemory={addMemory}
+            deleteMemory={deleteMemory}
+            memoryLoading={memoryLoading}
+            hasCouple={partnerConnected}
+            goToSettings={() => setPage("settings")}
+            onModalChange={setModalOpen}
           />
         )}
-
-
 
         {page === "settings" && (
           <SettingsPage
@@ -1033,7 +1034,6 @@ function App() {
 
         {!modalOpen && (
           <BottomNav
-          
             page={getActiveNavPage(page, detailsBackPage)}
             setPage={setPage}
           />
