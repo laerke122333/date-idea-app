@@ -1243,47 +1243,38 @@ p {
 /* MODAL */
 
 .modal-background {
-  padding: 20px;
-
   position: fixed;
-
   inset: 0;
 
-  z-index: 50;
+  min-height: 100dvh;
 
   display: flex;
-
+  align-items: center;
   justify-content: center;
 
-  align-items: flex-end;
+  padding: 20px;
 
-  background:
-    rgba(58, 28, 39, 0.32);
+  background: rgba(70, 45, 55, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 
-  backdrop-filter: blur(4px);
+  z-index: 9999;
 }
 
 .modal {
-  width: min(
-    390px,
-    100%
-  );
-
-  max-height: 90vh;
-
-  overflow-y: auto;
-
-  padding: 30px 24px;
-
   position: relative;
 
+  width: min(430px, 100%);
+  max-height: calc(100dvh - 40px);
+
+  margin: 0;
+
+  padding: 32px 24px;
+
+  background: #fffafa;
   border-radius: 30px;
 
-  background: #fff8fa;
-
-  box-shadow:
-    0 20px 60px
-      rgba(66, 28, 42, 0.2);
+  overflow-y: auto;
 }
 
 .modal h2 {
@@ -4667,4 +4658,43 @@ body.tried-modal-open .bottom-nav {
 
 .tried-details-form .outline {
   margin-bottom: 10px;
+}
+
+.mail-icon {
+  font-size: 40px;
+}
+
+.tried-modal-background {
+  position: fixed;
+  inset: 0;
+
+  min-height: 100dvh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(70, 45, 55, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  z-index: 9999;
+}
+
+.tried-modal {
+  position: relative;
+
+  width: min(430px, 100%);
+  max-height: calc(100dvh - 40px);
+
+  margin: 0;
+
+  padding: 32px 24px;
+
+  background: #fffafa;
+  border-radius: 30px;
+
+  overflow-y: auto;
 }

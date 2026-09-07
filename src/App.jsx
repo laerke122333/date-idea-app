@@ -975,10 +975,10 @@ function App() {
             setPage={setPage}
             backPage={detailsBackPage}
             saveTriedDate={saveTriedDate}
-            onModalChange={setDetailsModalOpen}
+            onModalChange={setModalOpen}
           />
         )}
-
+        
         {page === "saved" && (
           <SavedPage
             dates={savedDates}
@@ -3046,7 +3046,7 @@ function SettingsPage({
                 </div>
 
                 <div className="shared-featured-info-v2">
-                  <div className="shared-calendar-v2">▣</div>
+                  <div className="shared-calendar-v2">♥</div>
 
                   <div className="shared-featured-text-v2">
                     <h3>{featuredMemory.title}</h3>
@@ -3058,7 +3058,7 @@ function SettingsPage({
                     </p>
                   </div>
 
-                  <span className="shared-arrow-v2">›</span>
+                  <span className="shared-arrow-v2"></span>
                 </div>
               </article>
 
@@ -3087,7 +3087,7 @@ function SettingsPage({
                       </p>
                     </div>
 
-                    <span className="shared-arrow-v2">›</span>
+                    <span className="shared-arrow-v2"></span>
                   </article>
                 ))}
               </div>
@@ -3138,15 +3138,8 @@ function SettingsPage({
 
       <section className="settings-list settings-list-large">
         <button type="button">
-          <span>♧</span>
-          <p>Notifikationer</p>
-          <strong>›</strong>
-        </button>
-
-        <button type="button">
-          <span>▣</span>
-          <p>Privatliv</p>
-          <strong>›</strong>
+          <span>☺</span>
+          <p> Skriv gerne til mig med forslag til appen</p>
         </button>
 
         {partnerConnected && (
