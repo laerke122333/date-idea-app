@@ -173,6 +173,8 @@ const demoDates = [
 ========================================================= */
 
 function getActiveNavPage(page, detailsBackPage) {
+
+ 
   if (
     page === "suggestions" ||
     page === "loading" ||
@@ -978,7 +980,7 @@ function App() {
             onModalChange={setModalOpen}
           />
         )}
-        
+
         {page === "saved" && (
           <SavedPage
             dates={savedDates}
@@ -996,17 +998,16 @@ function App() {
           />
         )}
 
-        {page === "history" && (
-          <HistoryPage
+        {page === "frontpage" && (
+          <FrontPage
+            setPage={setPage}
+            savedDates={savedDates}
             memories={memories}
-            addMemory={addMemory}
-            deleteMemory={deleteMemory}
-            memoryLoading={memoryLoading}
-            hasCouple={partnerConnected}
-            goToSettings={() => setPage("settings")}
-            onModalChange={setModalOpen}
+            hasPartner={partnerConnected}
           />
         )}
+
+
 
         {page === "settings" && (
           <SettingsPage
@@ -1032,6 +1033,7 @@ function App() {
 
         {!modalOpen && (
           <BottomNav
+          
             page={getActiveNavPage(page, detailsBackPage)}
             setPage={setPage}
           />
@@ -1270,7 +1272,12 @@ function AuthPage() {
    FORSIDE
 ========================================================= */
 
-function FrontPage({ setPage, savedDates, memories, hasPartner }) {
+function FrontPage({
+  setPage,
+  savedDates,
+  memories,
+  hasPartner,
+}) {
   return (
     <section className="screen front-page">
       <div className="front-top">
@@ -1350,6 +1357,7 @@ function FrontPage({ setPage, savedDates, memories, hasPartner }) {
         </button>
       )}
 
+      
       <div className="front-quote">
         <span>♡</span>
 
@@ -1554,14 +1562,7 @@ function DateCard({ date, saved, openDate, toggleSaved }) {
   );
 }
 
-function cleanLocationSuggestion(location) {
-  if (!location) return "";
 
-  return location
-    .replace(/^Forslag i Aarhus:\s*/i, "")
-    .replace(/^Forslag nær Aarhus:\s*/i, "Nær Aarhus: ")
-    .replace(/^Forslag:\s*/i, "");
-}
 /* =========================================================
    DETAILS
 ========================================================= */
