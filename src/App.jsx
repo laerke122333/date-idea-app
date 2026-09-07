@@ -202,7 +202,6 @@ function getActiveNavPage(page, detailsBackPage) {
 ========================================================= */
 
 function App() {
-
   /* AUTH */
 
   const [session, setSession] = useState(null);
@@ -211,6 +210,7 @@ function App() {
   /* NAVIGATION */
 
   const [page, setPage] = useState("frontpage");
+  const [modalOpen, setModalOpen] = useState(false);
 
   /* DATE IDEAS */
 
@@ -703,7 +703,6 @@ function App() {
       setPartnerConnected(false);
       setPartnerProfile(null);
       setMemories([]);
-      
 
       return {
         success: true,
@@ -937,7 +936,6 @@ function App() {
   return (
     <main className="app">
       <div className="phone">
-
         {page === "frontpage" && (
           <FrontPage
             setPage={setPage}
@@ -956,17 +954,13 @@ function App() {
           />
         )}
 
-        {page === "loading" && (
-          <LoadingPage />
-        )}
+        {page === "loading" && <LoadingPage />}
 
         {page === "results" && (
           <ResultsPage
             results={results}
             selectedTags={selectedTags}
-            openDate={(date) =>
-              openDate(date, "results")
-            }
+            openDate={(date) => openDate(date, "results")}
             savedDates={savedDates}
             toggleSaved={toggleSaved}
             setPage={setPage}
@@ -981,6 +975,7 @@ function App() {
             setPage={setPage}
             backPage={detailsBackPage}
             saveTriedDate={saveTriedDate}
+            onModalChange={setDetailsModalOpen}
           />
         )}
 
@@ -995,9 +990,7 @@ function App() {
         {page === "spin" && (
           <SpinPage
             dateIdeas={dateIdeas}
-            openDate={(date) =>
-              openDate(date, "spin")
-            }
+            openDate={(date) => openDate(date, "spin")}
             savedDates={savedDates}
             toggleSaved={toggleSaved}
           />
@@ -1010,9 +1003,8 @@ function App() {
             deleteMemory={deleteMemory}
             memoryLoading={memoryLoading}
             hasCouple={partnerConnected}
-            goToSettings={() =>
-              setPage("settings")
-            }
+            goToSettings={() => setPage("settings")}
+            onModalChange={setModalOpen}
           />
         )}
 
@@ -1038,11 +1030,12 @@ function App() {
             NAVBAR - VISES PÅ ALLE SIDER EFTER LOGIN
         ============================================= */}
 
-        <BottomNav
-          page={getActiveNavPage(page, detailsBackPage)}
-          setPage={setPage}
-        />
-
+        {!modalOpen && (
+          <BottomNav
+            page={getActiveNavPage(page, detailsBackPage)}
+            setPage={setPage}
+          />
+        )}
       </div>
     </main>
   );
@@ -1580,20 +1573,52 @@ function DetailsPage({
   setPage,
   backPage,
   saveTriedDate,
+  onModalChange,
 }) {
   const saved = savedDates.some((item) => item.id === date.id);
 
   const [showTriedModal, setShowTriedModal] = useState(false);
-
   const [showExtraFields, setShowExtraFields] = useState(false);
-
   const [triedDate, setTriedDate] = useState("");
-
   const [triedImage, setTriedImage] = useState("");
-
   const [triedSaving, setTriedSaving] = useState(false);
-
   const [triedMessage, setTriedMessage] = useState("");
+
+  /* =====================================================
+     STOP BAGGRUNDEN FRA AT SCROLLE,
+     NÅR "GEM JERES DATE" ER ÅBEN
+  ===================================================== */
+
+  useEffect(() => {
+    if (showTriedModal) {
+      document.body.style.overflow = "hidden";
+      document.body.classList.add("tried-modal-open");
+    } else {
+      document.body.style.overflow = "";
+      document.body.classList.remove("tried-modal-open");
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.classList.remove("tried-modal-open");
+    };
+  }, [showTriedModal]);
+
+  /* =====================================================
+     ÅBN MODAL
+  ===================================================== */
+
+  function openTriedModal() {
+    setShowTriedModal(true);
+    setShowExtraFields(false);
+    setTriedMessage("");
+
+    onModalChange?.(true);
+  }
+
+  /* =====================================================
+     LUK MODAL
+  ===================================================== */
 
   function closeTriedModal() {
     setShowTriedModal(false);
@@ -1601,7 +1626,14 @@ function DetailsPage({
     setTriedDate("");
     setTriedImage("");
     setTriedMessage("");
+    setTriedSaving(false);
+
+    onModalChange?.(false);
   }
+
+  /* =====================================================
+     VÆLG BILLEDE
+  ===================================================== */
 
   function handleTriedImage(event) {
     const file = event.target.files?.[0];
@@ -1622,7 +1654,6 @@ function DetailsPage({
 
     reader.readAsDataURL(file);
   }
-
   /* GEM UDEN DATO/BILLEDE */
 
   async function handleQuickSave() {
@@ -1699,7 +1730,6 @@ function DetailsPage({
           {saved ? "♥" : "♡"}
         </button>
       </div>
-
       <div className="details-content">
         <div className="tags">
           {date.tags?.map((tag) => (
@@ -1749,7 +1779,7 @@ function DetailsPage({
           </div>
         </div>
 
-        <button className="primary" onClick={() => setShowTriedModal(true)}>
+        <button className="primary" onClick={openTriedModal}>
           Vi har prøvet den ♡
         </button>
 
@@ -1760,27 +1790,38 @@ function DetailsPage({
 
       {showTriedModal && (
         <div className="modal-background" onClick={closeTriedModal}>
-          <div className="modal" onClick={(event) => event.stopPropagation()}>
+          <div
+            className={`modal ${showExtraFields ? "modal-form-view" : ""}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            {/* LUK */}
             <button
               type="button"
               className="modal-close"
               onClick={closeTriedModal}
+              aria-label="Luk"
             >
               ×
             </button>
 
-            <span className="eyebrow">TIDLIGERE DATE</span>
+            {/* OVERSKRIFT */}
+            <span className="eyebrow">NYT MINDE</span>
 
-            <h2>Har I prøvet denne date?</h2>
+            <h2>Gem jeres date</h2>
 
             {!showExtraFields ? (
               <>
+                {/* =================================================
+              VALG
+          ================================================= */}
+
                 <p className="modal-intro-text">
                   Vil du bare gemme daten, eller vil du også tilføje dato og et
                   billede?
                 </p>
 
                 <div className="tried-choice-grid">
+                  {/* GEM BARE DATEN */}
                   <button
                     type="button"
                     className="choice-card"
@@ -1792,10 +1833,12 @@ function DetailsPage({
                     <p>Tilføj den til tidligere dates uden billede og dato.</p>
                   </button>
 
+                  {/* TILFØJ DATO OG BILLEDE */}
                   <button
                     type="button"
                     className="choice-card"
                     onClick={() => setShowExtraFields(true)}
+                    disabled={triedSaving}
                   >
                     <strong>Tilføj dato og billede</strong>
 
@@ -1804,51 +1847,69 @@ function DetailsPage({
                 </div>
               </>
             ) : (
-              <form onSubmit={handleDetailedSave}>
-                <label className="upload">
-                  {triedImage ? (
-                    <img src={triedImage} alt="Preview" />
-                  ) : (
-                    <>
-                      <span>＋</span>
-                      <p>Tilføj billede</p>
-                    </>
-                  )}
+              <>
+                {/* =================================================
+              DATO + BILLEDE
+          ================================================= */}
 
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleTriedImage}
-                  />
-                </label>
-
-                <label className="input-label">
-                  Dato
-                  <input
-                    type="date"
-                    value={triedDate}
-                    onChange={(event) => setTriedDate(event.target.value)}
-                  />
-                </label>
-
-                <button
-                  className="primary"
-                  type="submit"
-                  disabled={triedSaving}
+                <form
+                  className="tried-details-form"
+                  onSubmit={handleDetailedSave}
                 >
-                  {triedSaving ? "Gemmer..." : "Gem under tidligere dates ♡"}
-                </button>
+                  {/* BILLEDE */}
+                  <label className="upload">
+                    {triedImage ? (
+                      <img
+                        src={triedImage}
+                        alt="Forhåndsvisning af jeres date"
+                      />
+                    ) : (
+                      <>
+                        <span>＋</span>
+                        <p>Tilføj billede</p>
+                      </>
+                    )}
 
-                <button
-                  type="button"
-                  className="outline"
-                  onClick={() => setShowExtraFields(false)}
-                >
-                  Tilbage
-                </button>
-              </form>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleTriedImage}
+                    />
+                  </label>
+
+                  {/* DATO */}
+                  <label className="input-label">
+                    Dato
+                    <input
+                      type="date"
+                      value={triedDate}
+                      onChange={(event) => setTriedDate(event.target.value)}
+                    />
+                  </label>
+
+                  {/* GEM */}
+                  <button
+                    type="submit"
+                    className="primary"
+                    disabled={triedSaving}
+                  >
+                    {triedSaving ? "Gemmer..." : "Gem under tidligere dates ♡"}
+                  </button>
+
+                  {/* TILBAGE */}
+                  <button
+                    type="button"
+                    className="outline"
+                    onClick={() => setShowExtraFields(false)}
+                    disabled={triedSaving}
+                  >
+                    Tilbage
+                  </button>
+                </form>
+              </>
             )}
 
+            {/* BESKED */}
             {triedMessage && <p className="form-message">{triedMessage}</p>}
           </div>
         </div>
@@ -1856,6 +1917,7 @@ function DetailsPage({
     </section>
   );
 }
+
 
 /* =========================================================
    SPIN EN DATE
@@ -2215,6 +2277,7 @@ function HistoryPage({
   memoryLoading,
   hasCouple,
   goToSettings,
+  onModalChange,
 }) {
   const [showModal, setShowModal] = useState(false);
 
@@ -2233,6 +2296,16 @@ function HistoryPage({
   const [deleting, setDeleting] = useState(false);
 
   const [deleteMessage, setDeleteMessage] = useState("");
+
+  function openAddMemoryModal() {
+    setShowModal(true);
+    onModalChange?.(true);
+  }
+
+  function closeAddMemoryModal() {
+    setShowModal(false);
+    onModalChange?.(false);
+  }
 
   /* =========================================
      BILLEDE UPLOAD
@@ -2294,7 +2367,7 @@ function HistoryPage({
     setDate("");
     setImage("");
     setMessage("");
-    setShowModal(false);
+    closeAddMemoryModal();
   }
 
   /* =========================================
@@ -2367,7 +2440,7 @@ function HistoryPage({
         <button
           type="button"
           className="add-memory"
-          onClick={() => setShowModal(true)}
+          onClick={openAddMemoryModal}
         >
           <span className="plus">+</span>
 
@@ -2513,7 +2586,7 @@ function HistoryPage({
       ===================================== */}
 
       {showModal && (
-        <div className="modal-background" onClick={() => setShowModal(false)}>
+        <div className="modal-background" onClick={closeAddMemoryModal}>
           <form
             className="modal"
             onSubmit={submit}
@@ -2522,7 +2595,7 @@ function HistoryPage({
             <button
               type="button"
               className="modal-close"
-              onClick={() => setShowModal(false)}
+              onClick={closeAddMemoryModal}
             >
               ×
             </button>
@@ -3144,7 +3217,7 @@ function BottomNav({ page, setPage }) {
     },
     {
       id: "history",
-      label: "Tidligere",
+      label: "Minder",
       icon: "history",
     },
     {
