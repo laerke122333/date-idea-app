@@ -1747,7 +1747,7 @@ function DetailsPage({
             <div>
               <small>Forslag til lokation</small>
 
-              <p>{cleanLocationSuggestion(date.location_suggestion)}</p>
+              <p>{date.location_suggestion}</p>
             </div>
           </div>
         )}
