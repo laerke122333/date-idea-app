@@ -17,5 +17,4 @@ jobs:
         run: |
           curl --fail --silent --show-error --output /dev/null \
             "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/${{ env.PING_TABLE }}?select=*&limit=1" \
-            -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}"
+            -H "apikey: ${{ secrets.SUPABASE_SECRET_KEY }}"
