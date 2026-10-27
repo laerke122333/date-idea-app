@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PING_TABLE: dates
+      PING_TABLE: date_ideas
 
     steps:
       - name: Ping Supabase
         run: |
           curl --fail --silent --show-error --output /dev/null \
-            "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/${{ env.PING_TABLE }}?select=*&limit=1" \
+            "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/${{ env.PING_TABLE }}?select=id&limit=1" \
             -H "apikey: ${{ secrets.SUPABASE_SECRET_KEY }}"
